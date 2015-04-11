@@ -69,16 +69,16 @@ int main() {
   //vector<int> placements = { 5, 3, 6, 0, 7, 1, 4, 2 };
   //vector<int> placements = { 0, 2, 5, 7, 6, 3, 1, 4 };
 
-  int num_solutions = 0;
+  //int num_solutions = 0;
   do {
     if (valid_board(placements)) {
-      //print_board(placements);
-      //break;
-      num_solutions++;
+      print_board(placements);
+      break;
+      //num_solutions++;
     }
   } while (std::next_permutation(placements.begin(), placements.end()));
 
-  cout << num_solutions << endl;
+  //cout << num_solutions << endl;
 
   return 0;
 }
