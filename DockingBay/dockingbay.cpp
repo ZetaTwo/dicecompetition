@@ -28,13 +28,13 @@ bool valid_board(const vector<int>& placements) {
       board[row][i] = true;
 
       //Mark \ diagonal
-      size_t diag_col = placements[row] + (i - row);
+      size_t diag_col = placements[row] - row + i;
       if (diag_col >= 0 && diag_col < S) {
         board[i][diag_col] = true;
       }
 
       //Mark / diagonal
-      diag_col = placements[row] - (i - row);
+      diag_col = placements[row] + row - i;
       if (diag_col >= 0 && diag_col < S) {
         board[i][diag_col] = true;
       }
@@ -76,7 +76,7 @@ int main() {
       break;
       //num_solutions++;
     }
-  } while (std::next_permutation(placements.begin(), placements.end()));
+  } while (next_permutation(placements.begin(), placements.end()));
 
   //cout << num_solutions << endl;
 
