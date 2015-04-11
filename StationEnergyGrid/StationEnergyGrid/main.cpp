@@ -241,7 +241,7 @@ void run_game()
 	{
 		assert(filled_squares < ROW_SIZE*COL_SIZE);
 		bool scored = false;
-		if (cur_player == better_player)
+		if (cur_player == 234)
 			make_better_random_move(scored);
 		else
 			make_random_move(scored);
@@ -276,6 +276,7 @@ void end_game()
 	hor.clear();
 	ver.clear();
 	squares.clear();
+	playerScore.clear();
 	filled_squares = 0;
 }
 
@@ -287,7 +288,7 @@ int main()
 	cout << "Playing " << MATCHES_TO_PLAY << " matches!" << endl;
 	for (int iterations = 0; iterations < MATCHES_TO_PLAY; ++iterations)
 	{
-		init_game(2, 4, 4); // Num players, Num rows, num cols
+		init_game(4, 10, 10); // Num players, Num rows, num cols
 	}
 
 	for (auto i : players)
