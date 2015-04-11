@@ -23,7 +23,7 @@ using std::ofstream;	using std::pair;			using std::unordered_map;
 using std::make_pair;
 
 vector<string> strings;
-unordered_map<string, vector<pair<string, bool>>> string_map;
+unordered_map<string, vector<string>> string_map;
 
 // Sort based on the length of a string
 struct length_compare {
@@ -39,14 +39,7 @@ void add_to_map(string& st)
 {
 	string sorted_st = st;
 	std::sort(sorted_st.begin(), sorted_st.end()); // Sort string to find/build map
-
-	if (string_map[sorted_st].size() == 1) //1 element means  first collision has been found
-		string_map[sorted_st].back().second = true;
-
-	if (!string_map[sorted_st].empty()) //Not empty means current string has been found
-		string_map[sorted_st].push_back(make_pair(st, true));
-	else
-		string_map[sorted_st].push_back(make_pair(st, false));
+	string_map[sorted_st].push_back(st);
 }
 
 /*
@@ -56,17 +49,17 @@ void sort_results(ostream & out)
 {
 	vector<string> sorted_strings;
 
-	for (auto v : string_map)
+	for (auto v : string_map) // v = vector<key,vector<string>>
 	{
-		for (auto p : v.second)
-			if (p.second)
-				sorted_strings.push_back(p.first);
+		if (v.second.size() > 1)
+			sorted_strings.push_back(v.first);
 	}
 
 	const length_compare comp;
 	sort(sorted_strings.begin(), sorted_strings.end(), comp);
 	for (auto s : sorted_strings)
-		out << s << endl;
+		for (auto st : string_map[s])
+			out << st << endl;
 }
 
 /*
