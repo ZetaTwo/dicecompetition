@@ -57,26 +57,26 @@ def move():
 	
 	direction = int(request.form['direction'])
 	if direction == 0:
-		playerPos[0] -=1
 		playerPos[1] -=1
+		playerPos[0] -=1
 	elif direction == 1:
-		playerPos[0] -=1
-	elif direction == 2:
-		playerPos[0] -=1
-	elif direction == 3:
 		playerPos[1] -=1
+	elif direction == 2:
+		playerPos[1] -=1
+	elif direction == 3:
+		playerPos[0] -=1
 	elif direction == 4:
 		teleport()
 	elif direction == 5:
-		playerPos[1] +=1
+		playerPos[0] +=1
 	elif direction == 6:
-		playerPos[0] +=1
-		playerPos[1] -=1
-	elif direction == 7:
-		playerPos[0] +=1
-	elif direction == 8:
-		playerPos[0] +=1
 		playerPos[1] +=1
+		playerPos[0] -=1
+	elif direction == 7:
+		playerPos[1] +=1
+	elif direction == 8:
+		playerPos[1] +=1
+		playerPos[0] +=1
 	robotMove()
 	checkCrash()
 	winstatus = checkStatus()

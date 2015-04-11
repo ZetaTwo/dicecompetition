@@ -58,16 +58,16 @@
 #grid td {
 	width: 5px;
 	height: 5px;
-	background-color: #00cc00;
+	background-color: #996633;
 	border: 1px solid #000000;
 }
-.cell.robot {
+#grid .cell.robot {
 	background-color: #999999;
 }
-.cell.player {
-	background-color: #3333dd;
+#grid .cell.player {
+	background-color: #ff0000;
 }
-.cell.scrap {
+#grid .cell.scrap {
 	background-color: #000000;
 }
 #grid.endgame {

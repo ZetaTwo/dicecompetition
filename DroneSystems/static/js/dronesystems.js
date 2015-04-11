@@ -27,25 +27,27 @@ var game = {
 		}
 
 		self = this;
-		$('#move1').click(function() { self.move(1); });
-		$('#move2').click(function() { self.move(2); });
-		$('#move3').click(function() { self.move(3); });
-		$('#move4').click(function() { self.move(4); });
-		$('#move5').click(function() { self.move(5); });
-		$('#move6').click(function() { self.move(6); });
-		$('#move7').click(function() { self.move(7); });
-		$('#move8').click(function() { self.move(8); });
-		$('#move9').click(function() { self.move(9); });
+		$('#move1').click(function() { self.move(1-1); });
+		$('#move2').click(function() { self.move(2-1); });
+		$('#move3').click(function() { self.move(3-1); });
+		$('#move4').click(function() { self.move(4-1); });
+		$('#move5').click(function() { self.move(5-1); });
+		$('#move6').click(function() { self.move(6-1); });
+		$('#move7').click(function() { self.move(7-1); });
+		$('#move8').click(function() { self.move(8-1); });
+		$('#move9').click(function() { self.move(9-1); });
 	},
 
 	process_data: function(data) {
 		this.player = data.player;
 		this.robots = data.robots;
 		this.scrap = data.scrap;
+		this.winner = data.winstatus;
 	},
 
 	startgame: function(level) {
 		$.post('/restart', { level: level}, function(data) {
+
 
 			self.process_data(data);
 			self.updategrid();
@@ -55,16 +57,18 @@ var game = {
 
 	updatecontrols: function() {
 		$('.btn_move').addClass('off');
+		$('#move5').removeClass('off');
 
-		if(this.player.x > 0) $('#move4').removeClass('off');
-		if(this.player.x + 1< settings.WIDTH) $('#move6').removeClass('off');
-		if(this.player.y > 0) $('#move2').removeClass('off');
-		if(this.player.y + 1 < settings.HEIGHT) $('#move8').removeClass('off');
 
-		if(this.player.x > 0 && this.player.y > 0) $('#move1').removeClass('off');
-		if(this.player.x + 1 < settings.WIDTH && this.player.y > 0) $('#move3').removeClass('off');
-		if(this.player.x > 0 && this.player.y + 1 < settings.HEIGHT) $('#move7').removeClass('off');
-		if(this.player.x + 1 < settings.WIDTH && this.player.y + 1 < settings.HEIGHT) $('#move9').removeClass('off');
+		if(this.player[0] > 0) $('#move4').removeClass('off');
+		if(this.player[0] + 1< settings.WIDTH) $('#move6').removeClass('off');
+		if(this.player[1] > 0) $('#move2').removeClass('off');
+		if(this.player[1] + 1 < settings.HEIGHT) $('#move8').removeClass('off');
+
+		if(this.player[0] > 0 && this.player[1] > 0) $('#move1').removeClass('off');
+		if(this.player[0] + 1 < settings.WIDTH && this.player[1] > 0) $('#move3').removeClass('off');
+		if(this.player[0] > 0 && this.player[1] + 1 < settings.HEIGHT) $('#move7').removeClass('off');
+		if(this.player[0] + 1 < settings.WIDTH && this.player[1] + 1 < settings.HEIGHT) $('#move9').removeClass('off');
 	},
 
 	updategrid: function() {
@@ -98,7 +102,7 @@ var game = {
 
 	move: function(dir) {
 		self = this;
-		$.post('/restart', { move: dir}, function(data) {
+		$.post('/move', { direction: dir}, function(data) {
 			self.process_data(data);
 			self.updategrid();
 			self.updatecontrols();
