@@ -1,5 +1,5 @@
 /*
-*	This class solves the Anagramatic problem by using a map
+*	This class implements the Station Energy Grid game (generalized solution!)
 *
 */
 
