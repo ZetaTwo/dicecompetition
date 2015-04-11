@@ -37,12 +37,16 @@ void run_game();
 void end_game();
 void init_game(int nr_players, int nr_rows, int nr_cols);
 
+//Consts
+const int MATCHES_TO_PLAY = 1000;
+
 //Vars
 vector<vector<bool>> hor, ver, squares;
 unordered_map<int, int> playerScore;
 vector<int> players;
 std::mt19937 mt_rand((unsigned int)std::time(0));
 int cur_player, better_player, filled_squares, ROW_SIZE, COL_SIZE;
+
 
 /*
 	Change turn to next player
@@ -211,9 +215,11 @@ void init_game(int nr_players, int nr_rows, int nr_cols)
 	hor.resize(ROW_SIZE + 1, vector<bool>(COL_SIZE, false));
 	ver.resize(ROW_SIZE, vector<bool>(COL_SIZE + 1, false));
 	squares.resize(ROW_SIZE, vector<bool>(COL_SIZE, false));
-	for (int i = 0; i < nr_players; ++i)
-		players.push_back(i);
-
+	if (players.size() != nr_players)
+	{
+		for (int i = 0; i < nr_players; ++i)
+			players.push_back(i);
+	}
 	cur_player = players[0];
 	better_player = players[0];
 	run_game();
@@ -224,7 +230,7 @@ void init_game(int nr_players, int nr_rows, int nr_cols)
 */
 void run_game()
 {
-
+	
 	while (filled_squares != ROW_SIZE*COL_SIZE)
 	{
 		assert(filled_squares < ROW_SIZE*COL_SIZE);
@@ -237,6 +243,7 @@ void run_game()
 	}
 
 	end_game();
+
 }
 
 
@@ -245,12 +252,16 @@ End the game
 */
 void end_game()
 {
-	cout << "Game over" << endl;
+	//cout << "Game over" << endl;
 
 	for (auto i : players)
 	{
-		cout << "Player " << i << " got score: " << playerScore[i] << endl;
+		//cout << "Player " << i << " has score: " << playerScore[i] << endl;
 	}
+	hor.clear();
+	ver.clear();
+	squares.clear();
+	filled_squares = 0;
 }
 
 /*
@@ -258,7 +269,16 @@ void end_game()
 */
 int main()
 {
-	init_game(2,4,4); // Num players, Num rows, num cols
+
+	for (int iterations = 0; iterations < MATCHES_TO_PLAY; ++iterations)
+	{
+		init_game(2, 4, 4); // Num players, Num rows, num cols
+	}
+
+	for (auto i : players)
+	{
+		cout << "Player " << i << " got an average score of: " << double(playerScore[i])/double(MATCHES_TO_PLAY) << endl;
+	}
 	system("pause");
 
 	return EXIT_SUCCESS;
