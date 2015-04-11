@@ -1,6 +1,6 @@
 # DICE Programming Competition 2015
 
-This is our solutions to the problems at [DICE Programmign Competition 2015](dice.se/dice-programmeringstavling/).
+This is our solutions to the problems at [DICE Programming Competition 2015](dice.se/dice-programmeringstavling/).
 We solved 8/10 problems which you can find in their respective subdirectory.
 We would like to thank DICE for a really nice event and for the great prizes.
 Below is a short description of the problems.
