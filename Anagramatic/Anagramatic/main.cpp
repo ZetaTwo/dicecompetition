@@ -33,24 +33,24 @@ struct length_compare {
 };
 
 /*
-	Add each string to the map.
+Add each string to the map.
 */
 void add_to_map(string& st)
 {
-	string sorted_st = st; 
-	std:sort(sorted_st.begin(), sorted_st.end()); // Sort string to find/build map
+	string sorted_st = st;
+	std::sort(sorted_st.begin(), sorted_st.end()); // Sort string to find/build map
 
 	if (string_map[sorted_st].size() == 1) //1 element means  first collision has been found
 		string_map[sorted_st].back().second = true;
-	
+
 	if (!string_map[sorted_st].empty()) //Not empty means current string has been found
-		string_map[sorted_st].push_back(make_pair(st,true));
+		string_map[sorted_st].push_back(make_pair(st, true));
 	else
 		string_map[sorted_st].push_back(make_pair(st, false));
 }
 
 /*
-	Sort the anagrams according to letter length
+Sort the anagrams according to letter length
 */
 void sort_results(ostream & out)
 {
@@ -63,14 +63,14 @@ void sort_results(ostream & out)
 				sorted_strings.push_back(p.first);
 	}
 
-	length_compare comp;
+	const length_compare comp;
 	sort(sorted_strings.begin(), sorted_strings.end(), comp);
 	for (auto s : sorted_strings)
 		out << s << endl;
 }
 
 /*
-	Reads the problem from instream and prints the solutions to outstream.
+Reads the problem from instream and prints the solutions to outstream.
 */
 void run(istream &instream, ostream &outstream)
 {
@@ -91,7 +91,7 @@ The main function runs the program. Reads from unixdict.in and writes to output.
 int main()
 {
 	ofstream out("output.out");
-	ifstream in("unixdict.in");
+	ifstream in("unixdict.txt");
 	if (out.fail() || in.fail())
 		cout << "FAILED IN READING STREAMS" << endl;
 
