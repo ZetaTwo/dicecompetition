@@ -31,8 +31,8 @@ int square_sides_filled(int x, int y);
 bool check_if_scoring(int playerID, int x, int y);
 bool make_hor_move(int playerID, int x, int y);
 bool make_ver_move(int playerID, int x, int y);
-void make_random_move();
-void make_better_random_move();
+void make_random_move(bool&);
+void make_better_random_move(bool&);
 void run_game();
 void end_game();
 void init_game(int nr_players, int nr_rows, int nr_cols);
@@ -43,11 +43,10 @@ const int MATCHES_TO_PLAY = 1000;
 //Vars
 vector<vector<bool>> hor, ver, squares;
 unordered_map<int, int> playerScore;
+unordered_map<int, int> playerWins;
 vector<int> players;
 std::mt19937 mt_rand((unsigned int)std::time(0));
 int cur_player, better_player, filled_squares, ROW_SIZE, COL_SIZE;
-
-
 /*
 	Change turn to next player
 */
@@ -111,7 +110,7 @@ bool check_if_scoring(int playerID, int x, int y)
 /*
 	Draw a horizontal line
 */
-bool make_hor_move(int playerID, int x, int y)
+bool make_hor_move(int playerID, int x, int y, bool& scored)
 {
 	if (x < 0 || x >= ROW_SIZE+1 || y < 0 || y >= COL_SIZE)
 		return false;
@@ -119,8 +118,10 @@ bool make_hor_move(int playerID, int x, int y)
 	if (!hor[x][y])
 	{
 		hor[x][y] = true;
-		check_if_scoring(playerID,x-1, y);
-		check_if_scoring(playerID,x, y);
+		if(check_if_scoring(playerID,x-1, y))
+			scored = true;
+		if(check_if_scoring(playerID,x, y))
+			scored = true;
 	}
 	return true;
 }
@@ -128,7 +129,7 @@ bool make_hor_move(int playerID, int x, int y)
 /*
 	Draw a vertical line
 */
-bool make_ver_move(int playerID, int x, int y)
+bool make_ver_move(int playerID, int x, int y, bool& scored)
 {
 	if (x < 0 || x >= ROW_SIZE || y < 0 || y >= COL_SIZE+1)
 		return false;
@@ -136,8 +137,10 @@ bool make_ver_move(int playerID, int x, int y)
 	if (!ver[x][y])
 	{
 		ver[x][y] = true;
-		check_if_scoring(playerID, x, y-1);
-		check_if_scoring(playerID, x, y);
+		if (check_if_scoring(playerID, x, y - 1))
+			scored = true;
+		if (check_if_scoring(playerID, x, y))
+			scored = true;	
 	}
 	return true;
 }
@@ -145,7 +148,7 @@ bool make_ver_move(int playerID, int x, int y)
 /*
 	Make a completely pseudo-random move
 */
-void make_random_move()
+void make_random_move(bool& scored)
 {
 	bool is_hor_move = (bool) (mt_rand() % 2);
 	bool move_made = false;
@@ -155,13 +158,13 @@ void make_random_move()
 		{
 			int x = mt_rand() % (ROW_SIZE + 1);
 			int y = mt_rand() % COL_SIZE;
-			move_made = make_hor_move(cur_player, x, y);
+			move_made = make_hor_move(cur_player, x, y,scored);
 		}
 		else
 		{
 			int x = mt_rand() % ROW_SIZE;
 			int y = mt_rand() % (COL_SIZE + 1);
-			move_made = make_ver_move(cur_player, x, y);
+			move_made = make_ver_move(cur_player, x, y,scored);
 		}
 	}
 }
@@ -169,7 +172,7 @@ void make_random_move()
 /*
 	Make a better pseudo-random move (fill square if possible otherwise random)
 */
-void make_better_random_move()
+void make_better_random_move(bool& scored)
 {
 	for (int x = 0; x < ROW_SIZE; ++x)
 	{
@@ -179,29 +182,29 @@ void make_better_random_move()
 			{
 				if (!ver[x][y])
 				{
-					make_ver_move(cur_player,x, y);
+					make_ver_move(cur_player, x, y, scored);
 					return;
 				}
 				else if (!ver[x][y+1])
 				{
-					make_ver_move(cur_player, x, y+1);
+					make_ver_move(cur_player, x, y + 1, scored);
 					return;
 				}
 				else if (!hor[x][y])
 				{
-					make_hor_move(cur_player, x, y);
+					make_hor_move(cur_player, x, y, scored);
 					return;
 				}
 				else if (!hor[x + 1][y])
 				{
-					make_hor_move(cur_player, x + 1, y);
+					make_hor_move(cur_player, x + 1, y, scored);
 					return;
 				}
 			}
 		}
 	}
 
-	make_random_move();
+	make_random_move(scored);
 }
 
 
@@ -218,7 +221,11 @@ void init_game(int nr_players, int nr_rows, int nr_cols)
 	if (players.size() != nr_players)
 	{
 		for (int i = 0; i < nr_players; ++i)
+		{
 			players.push_back(i);
+			if (playerWins.find(i) == playerWins.end())
+				playerWins[i] = 0;
+		}
 	}
 	cur_player = players[0];
 	better_player = players[0];
@@ -230,16 +237,16 @@ void init_game(int nr_players, int nr_rows, int nr_cols)
 */
 void run_game()
 {
-	
 	while (filled_squares != ROW_SIZE*COL_SIZE)
 	{
 		assert(filled_squares < ROW_SIZE*COL_SIZE);
-
+		bool scored = false;
 		if (cur_player == better_player)
-			make_better_random_move();
+			make_better_random_move(scored);
 		else
-			make_random_move();
-		next_player();
+			make_random_move(scored);
+		if (!scored)
+			next_player();
 	}
 
 	end_game();
@@ -253,11 +260,19 @@ End the game
 void end_game()
 {
 	//cout << "Game over" << endl;
-
+	int curScore = -1;
+	int winner = -1;
 	for (auto i : players)
 	{
+		if (playerScore[i] > curScore)
+		{
+			winner = i;
+			curScore = playerScore[i];
+		}
 		//cout << "Player " << i << " has score: " << playerScore[i] << endl;
 	}
+
+	playerWins[winner]++;
 	hor.clear();
 	ver.clear();
 	squares.clear();
@@ -269,7 +284,7 @@ void end_game()
 */
 int main()
 {
-
+	cout << "Playing " << MATCHES_TO_PLAY << " matches!" << endl;
 	for (int iterations = 0; iterations < MATCHES_TO_PLAY; ++iterations)
 	{
 		init_game(2, 4, 4); // Num players, Num rows, num cols
@@ -277,7 +292,7 @@ int main()
 
 	for (auto i : players)
 	{
-		cout << "Player " << i << " got an average score of: " << double(playerScore[i])/double(MATCHES_TO_PLAY) << endl;
+		cout << "Player " << i << " won "<< playerWins[i] << " games and got an average score of: " << double(playerScore[i])/double(MATCHES_TO_PLAY) << endl;
 	}
 	system("pause");
 
