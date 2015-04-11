@@ -20,12 +20,14 @@ struct record_sorter {
   }
 };
 
-ifstream open_datafile(const string& filename) {
+ifstream open_datafile(const string& filename, bool header = false) {
   ifstream datafile(filename);
 
   //Discard header
-  //string header;
-  //getline(datafile, header);
+  if (header) {
+    string header;
+    getline(datafile, header);
+  }
 
   return datafile;
 }
@@ -61,7 +63,12 @@ record read_record(ifstream& datafile, bool full = true) {
   getline(linestream, token, ',');
   trim(token);
   if (token != "") {
-    r.diameter = stod(token);
+    try {
+      r.diameter = stod(token);
+    }
+    catch (...) {
+      r.diameter = 0;
+    }
   }
   else {
     r.diameter = 0;
@@ -72,25 +79,6 @@ record read_record(ifstream& datafile, bool full = true) {
 
 void write_record(ofstream& datafile, const record& r) {
   datafile << r.line << endl;
-}
-
-void split_file(string infilename, string outfilename1, string outfilename2, long rows) {
-  ifstream infile = open_datafile(infilename);
-  ofstream outfile1 = open_outfile(outfilename1);
-  ofstream outfile2 = open_outfile(outfilename2);
-
-  //Write first [rows] lines to out file 1
-  string line;
-  for (long i = 0; i < rows; i++)
-  {
-    getline(infile, line);
-    outfile1 << line << endl;
-  }
-
-  //Write rest of lines to out file 2
-  while (getline(infile, line)) {
-    outfile2 << line << endl;
-  }
 }
 
 void merge_files(string infilename1, string infilename2, string outfilename) {
@@ -129,6 +117,8 @@ void merge_files(string infilename1, string infilename2, string outfilename) {
 
   outfile.flush();
   outfile.close();
+  infile1.close();
+  infile2.close();
 }
 
 string create_filename(int index) {
@@ -137,15 +127,6 @@ string create_filename(int index) {
   return namestream.str();
 }
 
-void split(int index, int rows) {
-
-  split_file(
-    create_filename(index),
-    create_filename(2 * index+1),
-    create_filename(2 * index+2), 
-    rows/2
-  );
-}
 
 void merge(int index) {
   merge_files(
@@ -155,14 +136,16 @@ void merge(int index) {
   );
 }
 
-void mergesort_small(int index) {
+void mergesort_small(ifstream& datafile, int index) {
   vector<record> records;
-  ifstream datafile = open_datafile(create_filename(index));
   record r = read_record(datafile);
-  while (datafile.good()) {
+  while (datafile.good() && records.size() < 999) {
+    records.push_back(r);
+    r = read_record(datafile);
+  }
+  if (datafile.good()) {
     records.push_back(r);
   }
-  datafile.close();
 
   //Sort
   sort(records.begin(), records.end(), record_sorter());
@@ -173,49 +156,25 @@ void mergesort_small(int index) {
   }
 }
 
-void mergesort(int index, int rows) {
-  if (rows == 1) {
-    return;
-  }
-
-  if (rows > 1000) {
-    mergesort_small(index);
-    return;
-  }
-
-  if (rows > 1) {
-    split(index, rows);
-  }
-  if (rows > 2) {
-    mergesort(2*index+1, rows/2);
-    mergesort(2 * index + 2, rows - (rows/2));
-  }
-  merge(index);
-}
 
 int main() {
 
-  ifstream datafile = open_datafile("Test/results.csv");
-  ofstream sortfile = open_outfile(create_filename(0));
-  string line;
-  int rows = 0;
-  while (getline(datafile, line)) {
-    rows++;
-    if (rows > 1) {
-      sortfile << line << endl;
-    }
+  ifstream datafile = open_datafile("Test/results.csv", true);
+  
+  int parts = 0;
+  while (datafile.good()) {
+    mergesort_small(datafile, parts++);
   }
-  sortfile.close();
-  datafile.close();
+  //int parts = 682;
 
-  mergesort(0, rows-1);
-
-  datafile = open_datafile(create_filename(0));
-  sortfile = open_outfile("Test/results_sorted.csv");
-  sortfile << "spkid,full_name,neo,pha,spec_B,moid,full_name,a,e,i,om,w,q,ad,per_y,data_arc,condition_code,n_obs_used,n_del_obs_used,n_dop_obs_used,H,diameter,extent,albedo,rot_per,GM,BV,UB,IR,spec_B,spec_T" << endl;
-  while (getline(datafile, line)) {
-    sortfile << line << endl;
+  int i = 0;
+  while (i < parts) {
+    cout << "Merging part " << i << endl;
+    merge_files(create_filename(i), create_filename(i + 1), create_filename(parts));
+    i += 2;
+    parts += 1;
   }
+  rename(create_filename(parts-1).c_str(), "Test/results_sorted.csv");
 
   return 0;
 }
