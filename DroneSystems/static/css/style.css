@@ -1,5 +1,78 @@
+#map {
+	float: left;
+	width: 805px;
+}
+#controls {
+	margin-left: 815px;
+}
+
+.move_btn {
+	width: 32px;
+	height: 32px;
+	padding: 0;
+	background-repeat: no-repeat;
+	cursor: pointer;
+}
+.move_btn.off {
+	visibility: hidden;
+}
+#move1 {
+	background-image: url('/static/img/arrow_diag_left.png');
+	transform: rotate(90deg);
+}
+#move2 {
+	background-image: url('/static/img/arrow_left.png');
+	transform: rotate(90deg);
+}
+#move3 {
+	background-image: url('/static/img/arrow_diag_left.png');
+	transform: rotate(180deg);
+}
+#move4 {
+	background-image: url('/static/img/arrow_left.png');
+	/*transform: rotate(180deg);*/
+}
+#move5 {
+	background-image: url('/static/img/teleport.png');
+}
+#move6 {
+	background-image: url('/static/img/arrow_left.png');
+	transform: rotate(180deg);
+}
+#move7 {
+	background-image: url('/static/img/arrow_diag_left.png');
+	/*transform: rotate(deg);*/
+}
+#move8 {
+	background-image: url('/static/img/arrow_left.png');
+	transform: rotate(-90deg);
+}
+#move9 {
+	background-image: url('/static/img/arrow_diag_left.png');
+	transform: rotate(-90deg);
+}
+
+#grid {
+	border-collapse: collapse;
+}
 #grid td {
 	width: 5px;
 	height: 5px;
 	background-color: #00cc00;
+	border: 1px solid #000000;
+}
+.cell.robot {
+	background-color: #999999;
+}
+.cell.player {
+	background-color: #3333dd;
+}
+.cell.scrap {
+	background-color: #000000;
+}
+#grid.endgame {
+	display:none;
+}
+.hide {
+	display: none;
 }

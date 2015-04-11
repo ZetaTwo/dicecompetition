@@ -30,11 +30,8 @@ def init():
 	return len(robotsPos)
 		
 @app.route("/", methods=['GET'])
-
 def index():
-	if(len(robotsPos) == 0):
-		init()
-	return str(playerPos[0])+":"+str(playerPos[1])
+	return app.send_static_file('index.html')
 
 def teleport():
 	global playerPos
@@ -140,4 +137,5 @@ def checkCrash():
 			scrapPos.append(crash)
 			
 if __name__ == "__main__":
+	init()
 	app.run(debug=True)
