@@ -91,7 +91,7 @@ The main function runs the program. Reads from unixdict.in and writes to output.
 int main()
 {
 	ofstream out("output.out");
-	ifstream in("unixdict.in");
+	ifstream in("unixdict.txt");
 	if (out.fail() || in.fail())
 		cout << "FAILED IN READING STREAMS" << endl;
 
