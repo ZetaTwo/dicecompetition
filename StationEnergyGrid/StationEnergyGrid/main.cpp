@@ -24,7 +24,7 @@ using std::istream;		using std::ostream;			using std::ifstream;
 using std::ofstream;	using std::pair;			using std::unordered_map;
 using std::make_pair;
 
-//Forward declare
+//Forward declarations
 void next_player();
 bool is_out_of_bounds(int x, int y);
 int square_sides_filled(int x, int y);
@@ -32,21 +32,17 @@ bool check_if_scoring(int playerID, int x, int y);
 bool make_hor_move(int playerID, int x, int y);
 bool make_ver_move(int playerID, int x, int y);
 void make_random_move();
+void make_better_random_move();
 void run_game();
 void end_game();
 void init_game(int nr_players, int nr_rows, int nr_cols);
 
 //Vars
-int ROW_SIZE, COL_SIZE;
-
-vector<vector<bool>> hor;
-vector<vector<bool>> ver;
-vector<vector<bool>> squares;
+vector<vector<bool>> hor, ver, squares;
 unordered_map<int, int> playerScore;
 vector<int> players;
-std::mt19937 mt_rand(std::time(0));
-int cur_player;
-int filled_squares;
+std::mt19937 mt_rand((unsigned int)std::time(0));
+int cur_player, better_player, filled_squares, ROW_SIZE, COL_SIZE;
 
 /*
 	Change turn to next player
@@ -60,7 +56,7 @@ void next_player()
 }
 
 /*
-	Check if a coordinate is out of bounds
+	Check if a coordinate is out of bounds for the squares
 */
 bool is_out_of_bounds(int x, int y)
 {
@@ -108,7 +104,6 @@ bool check_if_scoring(int playerID, int x, int y)
 	return false;
 }
 
-
 /*
 	Draw a horizontal line
 */
@@ -127,7 +122,7 @@ bool make_hor_move(int playerID, int x, int y)
 }
 
 /*
-Draw a vertical line
+	Draw a vertical line
 */
 bool make_ver_move(int playerID, int x, int y)
 {
@@ -151,22 +146,24 @@ void make_random_move()
 	bool is_hor_move = (bool) (mt_rand() % 2);
 	bool move_made = false;
 	while (!move_made)
-	if (is_hor_move)
 	{
-		int x = mt_rand() % (ROW_SIZE + 1);
-		int y = mt_rand() % COL_SIZE;
-		move_made = make_hor_move(cur_player, x, y);
-	}
-	else
-	{
-		int x = mt_rand() % ROW_SIZE;
-		int y = mt_rand() % (COL_SIZE+1);
-		move_made = make_ver_move(cur_player, x, y);
+		if (is_hor_move)
+		{
+			int x = mt_rand() % (ROW_SIZE + 1);
+			int y = mt_rand() % COL_SIZE;
+			move_made = make_hor_move(cur_player, x, y);
+		}
+		else
+		{
+			int x = mt_rand() % ROW_SIZE;
+			int y = mt_rand() % (COL_SIZE + 1);
+			move_made = make_ver_move(cur_player, x, y);
+		}
 	}
 }
 
 /*
-Make a better pseudo-random move (fill square if possible otherwise random)
+	Make a better pseudo-random move (fill square if possible otherwise random)
 */
 void make_better_random_move()
 {
@@ -199,44 +196,13 @@ void make_better_random_move()
 			}
 		}
 	}
+
 	make_random_move();
 }
 
-/*
-	Run the game
-*/
-void run_game()
-{
-
-	while (filled_squares != ROW_SIZE*COL_SIZE)
-	{
-		assert(filled_squares < ROW_SIZE*COL_SIZE);
-
-		if (cur_player == players[0])
-			make_better_random_move();
-		else
-			make_random_move();
-		next_player();
-	}
-
-	end_game();
-}
 
 /*
-	End the game
-*/
-void end_game()
-{
-	cout << "Game over" << endl;
-	
-	for (auto i : players)
-	{
-		cout << "Player " << i << " got score: " << playerScore[i] << endl;
-	}
-}
-
-/*
-	Initialize the game and run it
+Initialize the game and run it
 */
 void init_game(int nr_players, int nr_rows, int nr_cols)
 {
@@ -249,7 +215,42 @@ void init_game(int nr_players, int nr_rows, int nr_cols)
 		players.push_back(i);
 
 	cur_player = players[0];
+	better_player = players[0];
 	run_game();
+}
+
+/*
+	Run the game by letting each player make a move
+*/
+void run_game()
+{
+
+	while (filled_squares != ROW_SIZE*COL_SIZE)
+	{
+		assert(filled_squares < ROW_SIZE*COL_SIZE);
+
+		if (cur_player == better_player)
+			make_better_random_move();
+		else
+			make_random_move();
+		next_player();
+	}
+
+	end_game();
+}
+
+
+/*
+End the game
+*/
+void end_game()
+{
+	cout << "Game over" << endl;
+
+	for (auto i : players)
+	{
+		cout << "Player " << i << " got score: " << playerScore[i] << endl;
+	}
 }
 
 /*
@@ -257,7 +258,7 @@ void init_game(int nr_players, int nr_rows, int nr_cols)
 */
 int main()
 {
-	init_game(2,4,4);
+	init_game(2,4,4); // Num players, Num rows, num cols
 	system("pause");
 
 	return EXIT_SUCCESS;
